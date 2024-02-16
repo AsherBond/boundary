@@ -37,6 +37,7 @@ import (
 	"github.com/hashicorp/boundary/internal/cmd/commands/userscmd"
 	"github.com/hashicorp/boundary/internal/cmd/commands/version"
 	"github.com/hashicorp/boundary/internal/cmd/commands/workerscmd"
+	"github.com/hashicorp/boundary/internal/cmd/wrapper"
 
 	"github.com/mitchellh/cli"
 )
@@ -570,6 +571,13 @@ func initCommands(ui, serverCmdUi cli.Ui, runOpts *RunOptions) {
 			return &genericcmd.Command{
 				Command: base.NewCommand(ui, opts...),
 				Func:    "delete",
+			}, nil
+		},
+
+		"ferry": func() (cli.Command, error) {
+			return &unsupported.UnsupportedCommand{
+				Command:     base.NewCommand(ui, opts...),
+				CommandName: "ferry",
 			}, nil
 		},
 
@@ -1329,16 +1337,7 @@ func initCommands(ui, serverCmdUi cli.Ui, runOpts *RunOptions) {
 
 var extraCommandsFuncs []func(ui, serverCmdUi cli.Ui, runOpts *RunOptions)
 
-// Keep this interface aligned with the interface at internal/clientcache/cmd/daemon/command_wrapper.go
-type cacheEnabledCommand interface {
-	cli.Command
-	BaseCommand() *base.Command
-}
-
 // clientCacheWrapper wraps all short lived, non server, command factories.
-// The default func is a noop.
-var clientCacheWrapper = func(c cacheEnabledCommand) cli.CommandFactory {
-	return func() (cli.Command, error) {
-		return c, nil
-	}
+func clientCacheWrapper(c wrapper.WrappableCommand) cli.CommandFactory {
+	return wrapper.Wrap(c)
 }

@@ -25,8 +25,8 @@ import (
 var errDaemonNotRunning = stderr.New("The daemon process is not running.")
 
 var (
-	_ cli.Command             = (*AddTokenCommand)(nil)
-	_ cli.CommandAutocomplete = (*AddTokenCommand)(nil)
+	_ cli.Command             = (*StatusCommand)(nil)
+	_ cli.CommandAutocomplete = (*StatusCommand)(nil)
 )
 
 type StatusCommand struct {
